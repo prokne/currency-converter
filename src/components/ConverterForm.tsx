@@ -1,7 +1,9 @@
 import React, { ChangeEvent, useState } from "react";
 import classes from "./ConverterForm.module.css";
 
-const ConverterForm: React.FC<{ currencies: string[] }> = (props) => {
+const ConverterForm: React.FC<{
+  currencies: { shortcut: string; name: string }[];
+}> = (props) => {
   const [enteredAmount, setEnteredAmount] = useState<string>("1");
 
   function amountChangeHandler(event: ChangeEvent<HTMLInputElement>) {
@@ -31,7 +33,9 @@ const ConverterForm: React.FC<{ currencies: string[] }> = (props) => {
         <label htmlFor="currency">From</label>
         <select id="currency">
           {props.currencies.map((currency) => (
-            <option value={currency}>{currency}</option>
+            <option key={currency.shortcut} value={currency.shortcut}>
+              {`${currency.shortcut} - ${currency.name}`}
+            </option>
           ))}
         </select>
       </div>
@@ -39,7 +43,9 @@ const ConverterForm: React.FC<{ currencies: string[] }> = (props) => {
         <label htmlFor="destination-currency">To</label>
         <select id="destination-currency">
           {props.currencies.map((currency) => (
-            <option value={currency}>{currency}</option>
+            <option key={currency.shortcut} value={currency.shortcut}>
+              {`${currency.shortcut} - ${currency.name}`}
+            </option>
           ))}
         </select>
       </div>
