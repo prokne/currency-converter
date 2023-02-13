@@ -1,0 +1,40 @@
+.form_content {
+  display: inline-block;
+}
+
+.form_content:nth-of-type(2) {
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+.form_content label {
+  font-weight: bold;
+}
+
+.form_content input,
+select {
+  width: 100%;
+  display: inline;
+  border-radius: 5px;
+  border: 1px solid rgb(147, 147, 147);
+  height: 30px;
+}
+
+.btn_section {
+  text-align: right;
+}
+
+.btn_section button {
+  margin: 30px 0 0 20px;
+  background-color: dodgerblue;
+  padding: 15px;
+  border-radius: 5px;
+  border: none;
+  color: aliceblue;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.btn_section button:hover {
+  background-color: rgb(21, 98, 175);
+}
