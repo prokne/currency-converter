@@ -1,5 +1,6 @@
 .form_content {
   display: inline-block;
+  width: 300px;
 }
 
 .form_content:nth-of-type(2) {
