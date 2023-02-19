@@ -4,18 +4,20 @@ import Card from "./ui/Card";
 import ConverterForm from "./components/ConverterForm";
 import ConverterResult from "./components/ConverterResult";
 import { useEffect, useState } from "react";
+import { Result } from "./types/types";
 
 function App() {
   const [currencies, setCurrencies] = useState<
     { shortcut: string; name: string }[]
   >([]);
+  const [result, setResult] = useState<Result | null>(null);
   const [isErr, setIsErr] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function getListOfCurrencies() {
       try {
-        const response = await fetch("http://localhost:3000/");
+        const response = await fetch("http://localhost:3000/currencies");
 
         if (!response.ok) {
           throw new Error(
@@ -40,14 +42,21 @@ function App() {
     getListOfCurrencies();
   }, []);
 
-  console.log(isLoading);
+  function setConverterResultContent(result: Result) {
+    setResult(result);
+  }
 
   return (
     <div className="content">
       <Card>
         {isLoading && <p>Converter is getting ready, please wait.</p>}
-        {!isLoading && <ConverterForm currencies={currencies} />}
-        <ConverterResult />
+        {!isLoading && (
+          <ConverterForm
+            currencies={currencies}
+            onGetResult={setConverterResultContent}
+          />
+        )}
+        <ConverterResult resultData={result} />
         {isErr && <p>{isErr}</p>}
       </Card>
     </div>

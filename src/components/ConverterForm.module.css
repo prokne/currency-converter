@@ -39,3 +39,8 @@ select {
 .btn_section button:hover {
   background-color: rgb(21, 98, 175);
 }
+
+.btn_section button:disabled {
+  background-color: rgb(135, 165, 193);
+  cursor: not-allowed;
+}
