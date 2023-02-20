@@ -1,73 +1,57 @@
-import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 import classes from "./ConverterForm.module.css";
-import { Result } from "../types/types";
+import { Currencies, Result } from "../types/types";
+import CurrencyOption from "./CurrencyOption";
+import useValidateInput from "../hooks/useValidateInput";
 
 //REFACTOR VALIDATION
 
+const initialFromCurrency = "USD";
+const initialToCurrency = "EUR";
+
 const ConverterForm: React.FC<{
-  currencies: { shortcut: string; name: string }[];
+  currencies: Currencies;
   onGetResult: (result: Result) => void;
 }> = (props) => {
-  const [enteredAmount, setEnteredAmount] = useState<string>("1.00");
-  const [isError, setIsError] = useState<string | null>(null);
+  const {
+    blurHandler: amountBlurHandler,
+    changeHandler: amountChangeHandler,
+    hasError: amountHasError,
+    value: enteredAmount,
+  } = useValidateInput(validateAmount, "1.00");
 
-  const fromCurrencyRef = useRef<HTMLSelectElement>(null);
-  const toCurrencyRef = useRef<HTMLSelectElement>(null);
+  const [fromCurrencyValue, setFromCurrencyValue] =
+    useState<string>(initialFromCurrency);
+  const [toCurrencyValue, setToCurrencyValue] =
+    useState<string>(initialToCurrency);
 
-  //Takes care of two way binding of the amount input
-  function amountChangeHandler(event: ChangeEvent<HTMLInputElement>) {
-    setEnteredAmount(event.target.value);
+  function validateAmount(input: string): boolean {
+    return +input >= 0;
   }
 
-  //Edits user input for better UX and to round entered amount and checks if entered amount is greater than 0
-  function amountBlurHandler() {
-    const enteredAmountToNumber = +enteredAmount;
-
-    if (enteredAmountToNumber < 0) {
-      setIsError("Entered amount must be greater than 0");
-      return;
-    }
-    const roundedNumber = enteredAmountToNumber.toFixed(2);
-    setEnteredAmount("" + roundedNumber);
-  }
+  const areCurrenciesValid = fromCurrencyValue !== toCurrencyValue;
+  const isFormValid = !amountHasError && areCurrenciesValid;
 
   function fromCurrencyChangeHandler(event: ChangeEvent<HTMLSelectElement>) {
-    if (event.target.value === toCurrencyRef.current?.value) {
-      setIsError(
-        "The destination currency must differ from the initial currency"
-      );
-    } else {
-      setIsError(null);
-    }
+    setFromCurrencyValue(event.target.value);
   }
 
   function toCurrencyChangeHandler(event: ChangeEvent<HTMLSelectElement>) {
-    if (event.target.value === fromCurrencyRef.current?.value) {
-      setIsError(
-        "The destination currency must differ from the initial currency"
-      );
-    } else {
-      setIsError(null);
-    }
+    setToCurrencyValue(event.target.value);
   }
 
   //Submits the form to the backend
   async function submitHandler(event: FormEvent) {
     event.preventDefault();
-    setIsError(null);
 
-    //Form cannot be submitted if the initial currency and the destination currency is the same
-    if (fromCurrencyRef.current?.value === toCurrencyRef.current?.value) {
-      setIsError(
-        "The destination currency must differ from the initial currency"
-      );
+    if (!isFormValid) {
       return;
     }
 
     const data = {
       amount: enteredAmount,
-      from: fromCurrencyRef.current?.value,
-      to: toCurrencyRef.current?.value,
+      from: fromCurrencyValue,
+      to: toCurrencyValue,
     };
 
     try {
@@ -77,10 +61,10 @@ const ConverterForm: React.FC<{
         body: JSON.stringify(data),
       });
 
-      const awaitedResult: Result = await response.json();
-      props.onGetResult(awaitedResult);
+      const awaitedResult = await response.json();
+      props.onGetResult(awaitedResult.data);
     } catch (error: any) {
-      setIsError(error.message || "Something went wrong");
+      //setIsError(error.message || "Something went wrong");
     }
   }
 
@@ -95,39 +79,33 @@ const ConverterForm: React.FC<{
           onBlur={amountBlurHandler}
           onChange={amountChangeHandler}
         />
+        {amountHasError && <p>Entered amount must be greater than 0</p>}
       </div>
       <div className={classes.form_content}>
         <label htmlFor="from-currency">From</label>
-        <select
-          id="from-currency"
-          ref={fromCurrencyRef}
-          onChange={fromCurrencyChangeHandler}
-        >
-          {props.currencies.map((currency) => (
-            <option key={currency.shortcut} value={currency.shortcut}>
-              {`${currency.shortcut} - ${currency.name}`}
-            </option>
-          ))}
+        <select id="from-currency" onChange={fromCurrencyChangeHandler}>
+          <CurrencyOption
+            currencies={props.currencies}
+            selected={initialFromCurrency}
+          ></CurrencyOption>
         </select>
+        {!areCurrenciesValid && (
+          <p>Initial currency and destination currency must differ</p>
+        )}
       </div>
       <div className={classes.form_content}>
         <label htmlFor="to-currency">To</label>
-        <select
-          id="to-currency"
-          ref={toCurrencyRef}
-          onChange={toCurrencyChangeHandler}
-        >
-          {props.currencies.map((currency) => (
-            <option key={currency.shortcut} value={currency.shortcut}>
-              {`${currency.shortcut} - ${currency.name}`}
-            </option>
-          ))}
+        <select id="to-currency" onChange={toCurrencyChangeHandler}>
+          <CurrencyOption
+            currencies={props.currencies}
+            selected={initialToCurrency}
+          ></CurrencyOption>
         </select>
       </div>
       <div className={classes.btn_section}>
-        <button disabled={isError?.includes("")}>Convert</button>
+        <button disabled={!isFormValid}>Convert</button>
       </div>
-      {isError && <p>{isError}</p>}
+      {/* {isError && <p>{isError}</p>} */}
     </form>
   );
 };

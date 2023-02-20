@@ -4,3 +4,8 @@ export type Result = {
   from: string;
   result: number;
 };
+
+export type Currencies = {
+  shortcut: string;
+  name: string;
+}[];
