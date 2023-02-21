@@ -1,6 +1,10 @@
+form {
+  width: 700px;
+}
+
 .form_content {
   display: inline-block;
-  width: 300px;
+  width: 30%;
 }
 
 .form_content:nth-of-type(2) {
@@ -19,6 +23,18 @@ select {
   border-radius: 5px;
   border: 1px solid rgb(147, 147, 147);
   height: 30px;
+}
+
+.form_error {
+  border: 1px solid red;
+  background-color: rgb(255, 173, 200);
+}
+
+.form_error_message {
+  color: red;
+  margin: 0;
+  display: block;
+  font-size: 12px;
 }
 
 .btn_section {

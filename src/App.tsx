@@ -3,6 +3,7 @@ import Card from "./ui/Card";
 
 import ConverterForm from "./components/ConverterForm";
 import ConverterResult from "./components/ConverterResult";
+import Stats from "./components/Stats";
 import { useEffect, useState } from "react";
 import { Result } from "./types/types";
 
@@ -19,23 +20,18 @@ function App() {
       try {
         const response = await fetch("http://localhost:3000/currencies");
 
-        if (!response.ok) {
-          throw new Error(
-            "Could not fetch data (status code: " + response.status + ")"
-          );
-        } else {
-          const data = await response.json();
+        const data = await response.json();
 
-          if (data.error) {
-            setIsErr(data.error);
-          } else {
-            setCurrencies(data.data);
-          }
-          setIsLoading(false);
+        if (data.error) {
+          setIsErr(data.error);
+          throw new Error(data.error);
         }
+
+        setCurrencies(data.data);
+        setIsLoading(false);
       } catch (err: any) {
         setIsLoading(false);
-        setIsErr(err.message);
+        setIsErr(err.message || "Something wen");
       }
     }
     setIsLoading(true);
@@ -46,6 +42,10 @@ function App() {
     setResult(result);
   }
 
+  function errorHandler(error: string) {
+    setIsErr(error);
+  }
+
   return (
     <div className="content">
       <Card>
@@ -54,10 +54,12 @@ function App() {
           <ConverterForm
             currencies={currencies}
             onGetResult={setConverterResultContent}
+            onError={errorHandler}
           />
         )}
         <ConverterResult resultData={result} />
         {isErr && <p>{isErr}</p>}
+        <Stats></Stats>
       </Card>
     </div>
   );
