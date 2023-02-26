@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { Currencies, Result } from "../types/types";
+import { Currencies, Result, Statistics } from "../types/types";
 import CurrencyOption from "./CurrencyOption";
 import useValidateInput from "../hooks/useValidateInput";
 
@@ -12,6 +12,7 @@ const ConverterForm: React.FC<{
   currencies: Currencies;
   onGetResult: (result: Result) => void;
   onError: (error: string) => void;
+  onGetStats: (stats: Statistics) => void;
 }> = (props) => {
   const {
     blurHandler: amountBlurHandler,
@@ -62,11 +63,14 @@ const ConverterForm: React.FC<{
         body: JSON.stringify(data),
       });
 
-      const awaitedResult = await response.json();
-      if (awaitedResult.error) {
-        throw new Error(awaitedResult.error || "Something went wrong");
+      const awaitedResponse = await response.json();
+      console.log(awaitedResponse.data);
+
+      if (awaitedResponse.error) {
+        throw new Error(awaitedResponse.error || "Something went wrong");
       }
-      props.onGetResult(awaitedResult.data);
+      props.onGetResult(awaitedResponse.data.result);
+      props.onGetStats(awaitedResponse.data.stats);
     } catch (error: any) {
       props.onError(error.message);
     }

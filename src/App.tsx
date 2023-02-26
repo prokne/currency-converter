@@ -5,12 +5,13 @@ import ConverterForm from "./components/ConverterForm";
 import ConverterResult from "./components/ConverterResult";
 import Stats from "./components/Stats";
 import { useEffect, useState } from "react";
-import { Result } from "./types/types";
+import { Result, Statistics } from "./types/types";
 
 function App() {
   const [currencies, setCurrencies] = useState<
     { shortcut: string; name: string }[]
   >([]);
+  const [stats, setStats] = useState<Statistics | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [isErr, setIsErr] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -27,23 +28,28 @@ function App() {
           throw new Error(data.error);
         }
 
-        setCurrencies(data.data);
+        setCurrencies(data.data.currencies);
+        setStats(data.data.stats);
         setIsLoading(false);
       } catch (err: any) {
         setIsLoading(false);
-        setIsErr(err.message || "Something wen");
+        setIsErr(err.message || "Something went wrong");
       }
     }
     setIsLoading(true);
     getListOfCurrencies();
   }, []);
 
-  function setConverterResultContent(result: Result) {
+  function resultHandler(result: Result) {
     setResult(result);
   }
 
   function errorHandler(error: string) {
     setIsErr(error);
+  }
+
+  function statsHandler(stats: Statistics) {
+    setStats(stats);
   }
 
   return (
@@ -53,13 +59,14 @@ function App() {
         {!isLoading && (
           <ConverterForm
             currencies={currencies}
-            onGetResult={setConverterResultContent}
+            onGetResult={resultHandler}
             onError={errorHandler}
+            onGetStats={statsHandler}
           />
         )}
         <ConverterResult resultData={result} />
         {isErr && <p>{isErr}</p>}
-        <Stats></Stats>
+        {stats && <Stats stats={stats}></Stats>}
       </Card>
     </div>
   );

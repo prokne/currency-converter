@@ -22,7 +22,11 @@ select {
   display: inline;
   border-radius: 5px;
   border: 1px solid rgb(147, 147, 147);
-  height: 30px;
+  height: 40px;
+  font-family: "Montserrat", sans-serif;
+  -webkit-box-shadow: 0px 1px 20px -8px rgba(148, 142, 148, 1);
+  -moz-box-shadow: 0px 1px 20px -8px rgba(148, 142, 148, 1);
+  box-shadow: 0px 1px 20px -8px rgba(148, 142, 148, 1);
 }
 
 .form_error {
