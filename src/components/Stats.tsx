@@ -9,7 +9,7 @@ const Stats: React.FC<{ stats: Statistics }> = (props) => {
       <h2>Statistics</h2>
       <div className={classes.stats_row}>
         <div className={`${classes.stats_column} ${classes.stats_name}`}>
-          <p> Most popular destination currency: </p>
+          <p>Most popular destination currency:</p>
           <p>Total amount converted:</p>
           <p>Total number of conversion requests made:</p>
         </div>

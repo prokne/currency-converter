@@ -15,3 +15,14 @@ export type Statistics = {
   totalAmount: number;
   totalNumberOfRequests: number;
 };
+
+export type appContextObj = {
+  currencies: { shortcut: string; name: string }[];
+  result: Result | null;
+  stats: Statistics | null;
+  isErr: string | null;
+  resultHandler: (result: Result) => void;
+  statsHandler: (stats: Statistics) => void;
+  errorHandler: (error: string) => void;
+  currenciesHandler: (currencies: { shortcut: string; name: string }[]) => void;
+};
