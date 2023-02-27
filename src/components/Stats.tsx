@@ -2,6 +2,8 @@ import { Statistics } from "../types/types";
 import classes from "./Stats.module.css";
 
 const Stats: React.FC<{ stats: Statistics }> = (props) => {
+  const mostPopDestCurrencies =
+    props.stats.mostPopularDestinationCurrencies.join(", ");
   return (
     <div className={classes.stats}>
       <h2>Statistics</h2>
@@ -12,7 +14,7 @@ const Stats: React.FC<{ stats: Statistics }> = (props) => {
           <p>Total number of conversion requests made:</p>
         </div>
         <div className={classes.stats_column}>
-          <p> {props.stats.mostPopularDestinationCurrency}</p>
+          <p> {mostPopDestCurrencies}</p>
           <p>${props.stats.totalAmount} USD</p>
           <p>{props.stats.totalNumberOfRequests}</p>
         </div>

@@ -46,12 +46,8 @@ const ConverterForm: React.FC<{
     event.preventDefault();
     props.onError("");
 
-    // if (!isFormValid) {
-    //   return;
-    // }
-
     const data = {
-      amount: enteredAmount,
+      amount: +enteredAmount,
       from: fromCurrencyValue,
       to: toCurrencyValue,
     };

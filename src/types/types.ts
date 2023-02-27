@@ -11,7 +11,7 @@ export type Currencies = {
 }[];
 
 export type Statistics = {
-  mostPopularDestinationCurrency: string;
+  mostPopularDestinationCurrencies: string[];
   totalAmount: number;
   totalNumberOfRequests: number;
 };

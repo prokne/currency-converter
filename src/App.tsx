@@ -1,4 +1,3 @@
-import "./App.css";
 import Card from "./ui/Card";
 
 import ConverterForm from "./components/ConverterForm";
@@ -6,6 +5,8 @@ import ConverterResult from "./components/ConverterResult";
 import Stats from "./components/Stats";
 import { useEffect, useState } from "react";
 import { Result, Statistics } from "./types/types";
+
+import classes from "./App.module.css";
 
 function App() {
   const [currencies, setCurrencies] = useState<
@@ -53,7 +54,7 @@ function App() {
   }
 
   return (
-    <div className="content">
+    <div className={classes.content}>
       <Card>
         {isLoading && <p>Converter is getting ready, please wait.</p>}
         {!isLoading && (
@@ -65,7 +66,7 @@ function App() {
           />
         )}
         <ConverterResult resultData={result} />
-        {isErr && <p>{isErr}</p>}
+        {isErr && <p className={classes.error}>{isErr}</p>}
         {stats && <Stats stats={stats}></Stats>}
       </Card>
     </div>
