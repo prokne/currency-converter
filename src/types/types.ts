@@ -17,12 +17,15 @@ export type Statistics = {
 };
 
 export type appContextObj = {
-  currencies: { shortcut: string; name: string }[];
+  currencies: Currencies;
   result: Result | null;
   stats: Statistics | null;
   isErr: string | null;
+  isLoading: boolean;
+  isConverting: boolean;
   resultHandler: (result: Result) => void;
   statsHandler: (stats: Statistics) => void;
   errorHandler: (error: string) => void;
+  isConvertingHandler: (isConverting: boolean) => void;
   currenciesHandler: (currencies: { shortcut: string; name: string }[]) => void;
 };

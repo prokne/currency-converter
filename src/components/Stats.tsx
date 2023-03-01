@@ -1,9 +1,12 @@
-import { Statistics } from "../types/types";
+import { useContext } from "react";
+import AppContext from "../store/app-context";
 import classes from "./Stats.module.css";
 
-const Stats: React.FC<{ stats: Statistics }> = (props) => {
+//Renders statistics
+const Stats: React.FC = () => {
+  const ctx = useContext(AppContext);
   const mostPopDestCurrencies =
-    props.stats.mostPopularDestinationCurrencies.join(", ");
+    ctx.stats?.mostPopularDestinationCurrencies.join(", ");
   return (
     <div className={classes.stats}>
       <h2>Statistics</h2>
@@ -15,8 +18,8 @@ const Stats: React.FC<{ stats: Statistics }> = (props) => {
         </div>
         <div className={classes.stats_column}>
           <p> {mostPopDestCurrencies}</p>
-          <p>${props.stats.totalAmount} USD</p>
-          <p>{props.stats.totalNumberOfRequests}</p>
+          <p>${ctx.stats?.totalAmount} USD</p>
+          <p>{ctx.stats?.totalNumberOfRequests}</p>
         </div>
       </div>
     </div>

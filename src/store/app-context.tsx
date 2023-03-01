@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { appContextObj, Result, Statistics } from "../types/types";
+import React, { useState, useEffect } from "react";
+import { appContextObj, Result, Statistics, Currencies } from "../types/types";
 
 export const AppContext = React.createContext<appContextObj>({
   currencies: [{ shortcut: "", name: "" }],
@@ -15,23 +15,52 @@ export const AppContext = React.createContext<appContextObj>({
     totalNumberOfRequests: 0,
   },
   isErr: "",
+  isLoading: true,
+  isConverting: false,
   resultHandler: (result: Result) => {},
   statsHandler: (stats: Statistics) => {},
   errorHandler: (error: string) => {},
-  currenciesHandler: (currencies: { shortcut: string; name: string }[]) => {},
+  currenciesHandler: (currencies: Currencies) => {},
+  isConvertingHandler: (isConverting: boolean) => {},
 });
 
-const AppContextProvider: React.FC<{ children?: React.ReactNode }> = (
+//AppContext component
+export const AppContextProvider: React.FC<{ children?: React.ReactNode }> = (
   props
 ) => {
-  const [currencies, setCurrencies] = useState<
-    { shortcut: string; name: string }[]
-  >([]);
+  const [currencies, setCurrencies] = useState<Currencies>([]);
   const [stats, setStats] = useState<Statistics | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [isErr, setIsErr] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isConverting, setIsConverting] = useState<boolean>(false);
 
-  function currenciesHandler(currencies: { shortcut: string; name: string }[]) {
+  //Fetches available currencies for populating select inputs and statistics only on the first render cycle
+  useEffect(() => {
+    async function getListOfCurrencies() {
+      try {
+        const response = await fetch("http://localhost:3000/currencies");
+        const data = await response.json();
+
+        if (data.error) {
+          setIsErr(data.error);
+          throw new Error(data.error);
+        }
+
+        setCurrencies(data.data.currencies);
+        setStats(data.data.stats);
+        setIsLoading(false);
+      } catch (err: any) {
+        setIsLoading(false);
+        setIsErr(err.message || "Something went wrong");
+      }
+    }
+    setIsLoading(true);
+    getListOfCurrencies();
+  }, []);
+
+  //Functions for state changes
+  function currenciesHandler(currencies: Currencies) {
     setCurrencies(currencies);
   }
 
@@ -47,15 +76,23 @@ const AppContextProvider: React.FC<{ children?: React.ReactNode }> = (
     setStats(stats);
   }
 
+  function isCovertingHandler(isConverting: boolean) {
+    setIsConverting(isConverting);
+  }
+
+  //Context value object
   const contextValue: appContextObj = {
     currencies: currencies,
     result: result,
     stats: stats,
     isErr: isErr,
+    isConverting: isConverting,
     resultHandler: resultHandler,
     errorHandler: errorHandler,
     statsHandler: statsHandler,
+    isConvertingHandler: isCovertingHandler,
     currenciesHandler: currenciesHandler,
+    isLoading: isLoading,
   };
 
   return (
@@ -65,4 +102,4 @@ const AppContextProvider: React.FC<{ children?: React.ReactNode }> = (
   );
 };
 
-export default AppContextProvider;
+export default AppContext;

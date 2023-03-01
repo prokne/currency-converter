@@ -1,12 +1,15 @@
-import { Result } from "../types/types";
+import { useContext } from "react";
+import AppContext from "../store/app-context";
 
 import classes from "./ConverterResult.module.css";
 
-const ConverterResult: React.FC<{ resultData: Result | null }> = (props) => {
+//Renders result of conversion only if result object is available
+const ConverterResult: React.FC = () => {
+  const ctx = useContext(AppContext);
   return (
     <div className={classes.result}>
-      {props.resultData && (
-        <p>{`${props.resultData.amount} ${props.resultData.from} = ${props.resultData.result} ${props.resultData.to}`}</p>
+      {ctx.result && (
+        <p>{`${ctx.result.amount} ${ctx.result.from} = ${ctx.result.result} ${ctx.result.to}`}</p>
       )}
     </div>
   );

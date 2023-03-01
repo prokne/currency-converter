@@ -1,19 +1,18 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
-import { Currencies, Result, Statistics } from "../types/types";
+import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
 import CurrencyOption from "./CurrencyOption";
 import useValidateInput from "../hooks/useValidateInput";
 
 import classes from "./ConverterForm.module.css";
+import AppContext from "../store/app-context";
 
 const initialFromCurrency = "USD";
 const initialToCurrency = "EUR";
 
-const ConverterForm: React.FC<{
-  currencies: Currencies;
-  onGetResult: (result: Result) => void;
-  onError: (error: string) => void;
-  onGetStats: (stats: Statistics) => void;
-}> = (props) => {
+//Creates converter form
+const ConverterForm: React.FC = () => {
+  const ctx = useContext(AppContext);
+
+  //Hook for entered amount validation
   const {
     blurHandler: amountBlurHandler,
     changeHandler: amountChangeHandler,
@@ -21,14 +20,19 @@ const ConverterForm: React.FC<{
     value: enteredAmount,
   } = useValidateInput(validateAmount, "1.00");
 
+  //States for select inputs
   const [fromCurrencyValue, setFromCurrencyValue] =
     useState<string>(initialFromCurrency);
   const [toCurrencyValue, setToCurrencyValue] =
     useState<string>(initialToCurrency);
 
+  //Validation select inputs
   const areCurrenciesValid = fromCurrencyValue !== toCurrencyValue;
+
+  //Validating form as a whole
   const isFormValid = amountIsValid && areCurrenciesValid;
 
+  //Validation function for entered amount validation hook
   function validateAmount(input: string): boolean {
     return +input > 0;
   }
@@ -44,7 +48,8 @@ const ConverterForm: React.FC<{
   //Submits the form to the backend
   async function submitHandler(event: FormEvent) {
     event.preventDefault();
-    props.onError("");
+    ctx.errorHandler("");
+    ctx.isConvertingHandler(true);
 
     const data = {
       amount: +enteredAmount,
@@ -65,19 +70,24 @@ const ConverterForm: React.FC<{
       if (awaitedResponse.error) {
         throw new Error(awaitedResponse.error || "Something went wrong");
       }
-      props.onGetResult(awaitedResponse.data.result);
-      props.onGetStats(awaitedResponse.data.stats);
+
+      //Update result and stat states to re-render
+      ctx.resultHandler(awaitedResponse.data.result);
+      ctx.statsHandler(awaitedResponse.data.stats);
+      ctx.isConvertingHandler(false);
     } catch (error: any) {
-      props.onError(error.message);
+      ctx.errorHandler(error.message);
+      ctx.isConvertingHandler(false);
     }
   }
 
+  //Error classes to style form inputs
   const inputErrorStyle = amountIsValid ? "" : classes.form_error;
   const selectErrorStyle = areCurrenciesValid ? "" : classes.form_error;
 
   return (
     <form onSubmit={submitHandler}>
-      <div>
+      <div className={classes.row}>
         <div className={classes.form_content}>
           <label htmlFor="amount">Amount</label>
           <input
@@ -98,7 +108,7 @@ const ConverterForm: React.FC<{
             className={selectErrorStyle}
             onChange={fromCurrencyChangeHandler}
           >
-            <CurrencyOption currencies={props.currencies}></CurrencyOption>
+            <CurrencyOption></CurrencyOption>
           </select>
         </div>
         <div className={classes.form_content}>
@@ -109,11 +119,12 @@ const ConverterForm: React.FC<{
             defaultValue={initialToCurrency}
             onChange={toCurrencyChangeHandler}
           >
-            <CurrencyOption currencies={props.currencies}></CurrencyOption>
+            <CurrencyOption></CurrencyOption>
           </select>
         </div>
       </div>
-      <div>
+
+      <div className={classes.row}>
         <div className={classes.form_content}>
           {!amountIsValid && (
             <p className={classes.form_error_message}>
@@ -121,6 +132,15 @@ const ConverterForm: React.FC<{
             </p>
           )}
         </div>
+
+        <div className={classes.form_content}>
+          {!areCurrenciesValid && (
+            <p className={classes.form_error_message}>
+              Initial currency and destination currency must differ
+            </p>
+          )}
+        </div>
+
         <div className={classes.form_content}>
           {!areCurrenciesValid && (
             <p className={classes.form_error_message}>
@@ -129,6 +149,7 @@ const ConverterForm: React.FC<{
           )}
         </div>
       </div>
+
       <div className={classes.btn_section}>
         <button disabled={!isFormValid}>Convert</button>
       </div>

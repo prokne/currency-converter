@@ -1,10 +1,13 @@
-import { Currencies } from "../types/types";
+import { useContext } from "react";
+import AppContext from "../store/app-context";
 
-const CurrencyOption: React.FC<{ currencies: Currencies }> = (props) => {
+//Creates option elemenets based on array of currencies recieved from backend
+const CurrencyOption: React.FC = () => {
+  const ctx = useContext(AppContext);
   return (
     <>
       (
-      {props.currencies.map((currency) => {
+      {ctx.currencies.map((currency) => {
         return (
           <option key={currency.shortcut} value={currency.shortcut}>
             {`${currency.shortcut} - ${currency.name}`}
